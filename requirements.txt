@@ -1,1 +1,2 @@
-# Your requirements go here
+colorama==0.4.5
+colour==0.1.5

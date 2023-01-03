@@ -1,5 +1,6 @@
 import random
 import colorama
+import words
 from colorama import Fore, Back, Style
 colorama.init(autoreset=True)
 from graphics import welcome
@@ -12,9 +13,9 @@ def welcome_screen():
     Option where player kan choose to begin game, select difficulty
     or view the rules
     """
-    print (welcome)
-    print (" Press " + "1" + " to play game")
-    print (" Press " + "2" + " to enter difficulty")
+    print(welcome)
+    print(" Press " + "1" + " to play game")
+    print(" Press " + "2" + " to enter difficulty")
     print(" Press " + "3" + " to view rules")
     options = False
     while not options:
@@ -29,13 +30,13 @@ def welcome_screen():
 
         elif settings == "3":
             options = True
-            game_rules()
+            rules()
 
         else:
             print(" Please select 1, 2 or 3 to make your"
                   " choice")
 
-def difficulty_level():
+def choose_difficulty():
     """
     This is where the player gets to chose difficulty level
     """
@@ -85,7 +86,7 @@ def game_play(random_words, total_lives):
     print("\n")
     print("Lets play Hangman!\n")
     print(f" Lives: {tries}\n")
-    print(f" The word to guess: " + " ".join(secret_word) + "\n" )
+    print(f" The word to guess: " + " ".join(secret_word) + "\n")
 
     while not game_over and tries > 0:
         player_guess = input("Guess a letter:\n".upper())
@@ -103,14 +104,14 @@ def game_play(random_words, total_lives):
                     f" which is not a letter"
                 )
             
-            elif len(player_guess) == 1 and player_try.isalpha():
+            elif len(player_guess) == 1 and player_guess.isalpha():
                 if player_guess in guesswork:
                     raise ValueError(
                         f" You have already guessed {(player_guess)}"
                     )
 
                 elif player_guess not in random_words:
-                    message = f" {(player_guess)} is not in"\
+                    info = f" {(player_guess)} is not in"\
                               f" the word. You lose a life."
 
                     guesswork.append(player_guess)
@@ -122,34 +123,33 @@ def game_play(random_words, total_lives):
 
                     guesswork.append(player_guess)
                     secret_word_list = list(secret_word)
-                    indi = [i for i, letter in enumerate(word)
-                               if letter == player_guess]
+                    indi = [i for i, letter in enumerate(random_words)
+                            if letter == player_guess]
                     for index in indi:
                         secret_word_list[index] = player_guess
                         secret_word = "".join(secret_word_list)
                     if "_" not in secret_word:
                         game_over = True
-
-                        
+                                        
         except ValueError as e:
-                print(f"Please try again.\n")
-                continue
+            print(f"{e}. Please try again.")
+            continue
 
         print(hangman_tries(tries))
 
-        if lives > 0:
+        if tries > 0:
             print(info)
             print(f" Lives: {tries}\n")
-            print(f" The word to guess: " + " ".join(secret_word) + "\n")
+            print(" The word to guess: " + " ".join(secret_word) + "\n")
             print(" Letters guessed: " + ", ".join(sorted(guesswork)) + "\n")
 
     if game_over:
-        print(f"Congratulations. {random_words} was the correct" f" word!")
-        the_player_win()
+        print(f"Congratulations. {random_words} was the correct word!")
+        player_win()
 
     else:
         print(f" The correct word was {random_words}")
-        the_hangman_win()
+        hangman_win()
 
     restart(total_lives)
     
@@ -160,12 +160,12 @@ def restart(total_lives):
     """
     restart = False
     while not restart:
-        restart_game = input (f" Would you like to play again?" f" Y/N ").upper()
+        restart_game = input(" Would you like to play again? \"Y/N\"").upper()
 
         try:
             if restart_game == "Y":
                 restart = True
-                hangman_word = get_word()
+                hidden_words = get_word()
 
                 game_play(hm_word, total_lives)
 
@@ -180,11 +180,11 @@ def restart(total_lives):
                 )
 
         except ValueError as e:
-            print(f"\n Please try again.\n")
+            print(f"{e}.Please try again.")
 
 def player_win():
     """
-    Display You Win! graphic
+    Graphic that displays if the player win!
     """
     print(
         """
@@ -202,7 +202,7 @@ def player_win():
 
 def hangman_win():
     """
-    Display Game Over! graphic
+     Graphic that displays if the player loose!
     """
     print(
         """
@@ -217,22 +217,147 @@ def hangman_win():
          \\___/  \\_/ \\___|_|  (_)
         """ 
         )
-hangman_win()
 
-def main():
+def hangman_tries(tries):
+    """
+    Displays hangman graphic based on lives left
+    """
+    tries_left = [
+        """
+        ___________
+        |/        |
+        |         O
+        |        /|\\
+        |         |
+        |        / \\
+        |\\
+        ========
+        """,
+        """
+        ___________
+        |/        |
+        |         O
+        |        /|\\
+        |         |
+        |        /
+        |\\
+        ========
+        """,
+        """
+        __________
+        |/        |
+        |         O
+        |        /|\\
+        |         |
+        |
+        |\\
+        ========
+        """,
+        """
+        __________
+        |/        |
+        |         O
+        |        /|
+        |         |
+        |
+        |\\
+        ========
+        """,
+        """
+        __________
+        |/        |
+        |         O
+        |         |
+        |         |
+        |
+        |\\
+        ========
+        """,
+        """
+        __________
+        |/        |
+        |         O
+        |
+        |
+        |
+        |\\
+        ========
+        """,
+        """
+        __________
+        |/
+        |
+        |
+        |
+        |
+        |\\
+        ========
+        """,
+        """
+        __________
+        |/
+        |
+        |
+        |
+        |
+        |
+        ========
+        """,
+        """
+        |/
+        |
+        |
+        |
+        |
+        |
+        ========
+        """,
+
+        """
+        |
+        |
+        |
+        |
+        |
+        ========
+        """,
+        """
+        """
+    ]
+    return tries_left[tries]
+
+def rules():
+    """
+    Game rules
+    """
+    print(
+        """
+        Guess the word by inputting letters.
+        If you get a letter wrong you will lose a life
+        and the hangman will begin building.
+        When you reach 0 lives you will be hanged
+        and it is game over!
+        """
+    )
+    start_menu = input(" Press enter to return to the start" "menu\n")
+    print("\n")
+    start()
+
+    
+
+def start():
     """
     Runs the game
     """
-    hangman_title()
     print(hangman_tries(0))
     level = welcome_screen()
     if level == "default":
         num_lives = 7
     else:
-        num_lives = select_difficulty()
+        num_lives = choose_difficulty()
 
-    hm_word = get_random_word()
-    play_game(hangman_word, num_lives)
+    words = get_word()
+    game_play(words, num_lives)
 
 
-main()
+start()
